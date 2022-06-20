@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.persistence.EntityExistsException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class EmployeServiceTest {
 
 
         //when
-        employeService.embaucheEmploye("oui","non", Poste.TECHNICIEN, NiveauEtude.BAC,1.0);
+        employeService.embaucheEmploye("oui","non", Poste.TECHNICIEN, NiveauEtude.BAC,0.5);
 
 
         //then
@@ -69,8 +70,8 @@ public class EmployeServiceTest {
         Assertions.assertThat(employe.getPrenom()).isEqualTo("non");
         Assertions.assertThat(employe.getDateEmbauche()).isEqualTo(LocalDate.now());
         Assertions.assertThat(employe.getPerformance()).isEqualTo(Entreprise.PERFORMANCE_BASE);
-        Assertions.assertThat(employe.getSalaire()).isEqualTo(1673.34);
-        Assertions.assertThat(employe.getTempsPartiel()).isEqualTo(1);
+        Assertions.assertThat(employe.getSalaire()).isEqualTo(836.67);
+        Assertions.assertThat(employe.getTempsPartiel()).isEqualTo(0.5);
     }
 
     @Test
@@ -94,23 +95,35 @@ public class EmployeServiceTest {
         Assertions.assertThat(employe.getDateEmbauche()).isEqualTo(LocalDate.now());
         Assertions.assertThat(employe.getPerformance()).isEqualTo(Entreprise.PERFORMANCE_BASE);
         Assertions.assertThat(employe.getSalaire()).isEqualTo(1673.34);
-        Assertions.assertThat(employe.getTempsPartiel()).isEqualTo(null);
+        Assertions.assertThat(employe.getTempsPartiel()).isNull();
     }
 
     @Test
-    public void testEmbaucheEmployeWithMaxMatriculePass() throws EmployeException {
+    public void testEmbaucheEmployeWithSameMatricule() throws EmployeException {
         //given
-        Mockito.when(employeRepository.findLastMatricule()).thenReturn("99999");
-        //Mockito.when(employeRepository.findByMatricule("T00001")).thenReturn(null);
-
+        Mockito.when(employeRepository.findLastMatricule()).thenReturn(null);
+        Mockito.when(employeRepository.findByMatricule("T00001")).thenReturn(new Employe());
 
         //when
-        //employeService.embaucheEmploye("oui","non", Poste.TECHNICIEN, NiveauEtude.BAC,null);
-
+        Throwable t = Assertions.catchThrowable(() -> {
+            employeService.embaucheEmploye("oui","non", Poste.TECHNICIEN, NiveauEtude.BAC,null);
+        });
 
         //then
-        Assertions.assertThatThrownBy(() -> {
+        Assertions.assertThat(t).isInstanceOf(EntityExistsException.class).hasMessage("L'employé de matricule T00001 existe déjà en BDD");
+    }
+
+    @Test
+    public void testEmbaucheEmployeWithMaxMatriculeReach() throws EmployeException {
+        //given
+        Mockito.when(employeRepository.findLastMatricule()).thenReturn("99999");
+
+        //when
+        Throwable t = Assertions.catchThrowable(() -> {
             employeService.embaucheEmploye("oui","non", Poste.TECHNICIEN, NiveauEtude.BAC,null);
-        }).hasMessage("Limite des 100000 matricules atteinte !");
+        });
+
+        //then
+        Assertions.assertThat(t).isInstanceOf(EmployeException.class).hasMessage("Limite des 100000 matricules atteinte !");
     }
 }

@@ -141,10 +141,12 @@
 				</dependencies>
 				<configuration>
 					<targetClasses>
-						<param>com.ipiecoles.java.java350.*</param>
+						<param>com.ipiecoles.java.java350.model.*</param>
+						<param>com.ipiecoles.java.java350.service.*</param>
 					</targetClasses>
 					<targetTests>
-						<param>com.ipiecoles.java.java350.*</param>
+						<param>com.ipiecoles.java.java350.model.*</param>
+						<param>com.ipiecoles.java.java350.service.*</param>
 					</targetTests>
 				</configuration>
 			</plugin>
