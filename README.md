@@ -84,7 +84,7 @@ Tester de façon intégrée un cas nominal de la méthode `embaucheEmploye` de l
 
 # Evaluation
 
-Commencer par faire une branche `evaluation` à partir de votre branche `master` une fois le TP terminé. Travailler sur cette branche pour l'évaluation.
+Commencer par faire une branche `eval` à partir de votre branche `master` une fois le TP terminé. Travailler sur cette branche pour l'évaluation.
 
 ## Tests unitaires et TDD
 
