@@ -9,10 +9,7 @@ import com.ipiecoles.java.java350.repository.EmployeRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.persistence.EntityExistsException;
@@ -79,6 +76,9 @@ public class EmployeServiceTest {
         //given
         Mockito.when(employeRepository.findLastMatricule()).thenReturn(null);
         Mockito.when(employeRepository.findByMatricule("T00001")).thenReturn(null);
+        // dans le cas d'un employe (e) retourné lors d'un e = erepo.save(e) coté classe testée
+        // il faut faire ceci pour pouvoir exécuter du code qui demanderais une méthode public liée sinon valeur null et plantage:
+        // Mockito.when(employeRepository.save(Mockito.any(Employe.class))).thenAnswer(AdditionalAnswers.returnsFirstArg());
 
 
         //when

@@ -228,4 +228,19 @@ case SATURDAY:var = var + 1;
     public int hashCode() {
         return Objects.hash(id, nom, prenom, matricule, dateEmbauche, salaire, performance);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Employe{");
+        sb.append("id=").append(id);
+        sb.append(", nom='").append(nom).append('\'');
+        sb.append(", prenom='").append(prenom).append('\'');
+        sb.append(", matricule='").append(matricule).append('\'');
+        sb.append(", dateEmbauche=").append(dateEmbauche);
+        sb.append(", salaire=").append(salaire);
+        sb.append(", performance=").append(performance);
+        sb.append(", tempsPartiel=").append(tempsPartiel);
+        sb.append('}');
+        return sb.toString();
+    }
 }
