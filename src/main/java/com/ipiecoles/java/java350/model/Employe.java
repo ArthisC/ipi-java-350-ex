@@ -1,5 +1,7 @@
 package com.ipiecoles.java.java350.model;
 
+import com.ipiecoles.java.java350.exception.EmployeException;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -62,18 +64,33 @@ public class Employe {
         return getNbRtt(LocalDate.now());
     }
 
+    /**
+     * Calcul du nombre de RTT selon la règle:
+     * nb jours dans l'année - nb jours travaillés à temps plein - nb samedi et dimanche -
+     * nb congés - nb jours fériés qui ne tombe pas un week-end.
+     * Le tout au pro-rata du taux d'activité du salarié (valeur du temps partiel)
+     *
+     * @param d Date de l'année
+     * @return nombre de RTT
+     */
     public Integer getNbRtt(LocalDate d){
-        int i1 = d.isLeapYear() ? 365 : 366;int var = 104;
+        int i1 = d.isLeapYear() ? 366 : 365;
+        int var = 104;
         switch (LocalDate.of(d.getYear(),1,1).getDayOfWeek()){
-        case THURSDAY: if(d.isLeapYear()) var =  var + 1; break;
+        case THURSDAY:
+            //if(d.isLeapYear()) var =  var + 1;
+            break;
         case FRIDAY:
-        if(d.isLeapYear()) var =  var + 2;
-        else var =  var + 1;
-case SATURDAY:var = var + 1;
-                    break;
+            if(d.isLeapYear()) var =  var + 2;
+            //else var =  var + 1;
+            break;
+        case SATURDAY:
+            var = var + 1;
+            break;
         }
         int monInt = (int) Entreprise.joursFeries(d).stream().filter(localDate ->
                 localDate.getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()).count();
+        System.out.println(d.getYear() + " " + var);
         return (int) Math.ceil((i1 - Entreprise.NB_JOURS_MAX_FORFAIT - var - Entreprise.NB_CONGES_BASE - monInt) * tempsPartiel);
     }
 
@@ -113,7 +130,26 @@ case SATURDAY:var = var + 1;
     }
 
     //Augmenter salaire
-    //public void augmenterSalaire(double pourcentage){}
+
+    /**
+     * Augmente le salaire d'un certain pourcentage,
+     * compris entre 0.0 (0%) exclu et 1.0 (100%) inclu
+     *
+     * @param pourcentage
+     */
+    public void augmenterSalaire(double pourcentage) throws EmployeException {
+        if (this.salaire != null){
+            if (0.0 < pourcentage && pourcentage <= 1.0){
+                this.salaire += this.salaire * pourcentage;
+            }
+            else{
+                throw new EmployeException("Le pourcentage doit être compris entre 0 exclu et 1 inclu !");
+            }
+        }
+        else{
+            throw new EmployeException("Le salaire est null !");
+        }
+    }
 
     public Long getId() {
         return id;
