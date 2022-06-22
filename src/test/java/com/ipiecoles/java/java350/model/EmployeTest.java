@@ -188,11 +188,13 @@ public class EmployeTest {
     //Test getNbRtt
     @ParameterizedTest
     @CsvSource({
-            "2019,1.0,8",
-            "2021,1.0,11",
-            "2022,1.0,10",
-            "2032,1.0,12",
-            "2032,0.5,6"
+            "2019,1.0,8",  //année non bissextile commençant un mardi
+            "2021,1.0,11", //année non bissextile commençant un vendredi
+            "2022,1.0,10", //année non bissextile commençant un samedi
+            "2032,1.0,12", //année bissextile commençant un jeudi
+            "2032,0.5,6",  //année bissextile commençant un jeudi avec mi-temps
+            "2028,1.0,8",  //année bissextile commençant un samedi
+            "2016,1.0,10"  //année bissextile commençant un vendredi
     })
     public void testGetNbRtt(
             Integer annee,

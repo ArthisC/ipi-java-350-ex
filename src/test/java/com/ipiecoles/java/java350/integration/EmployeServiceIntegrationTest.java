@@ -63,4 +63,38 @@ public class EmployeServiceIntegrationTest {
         Assertions.assertThat(employe.getSalaire()).isEqualTo(1673.34);
         Assertions.assertThat(employe.getTempsPartiel()).isEqualTo(1);
     }
+
+    @Test
+    public void testCalculPerformanceCommercial() throws EmployeException {
+        //given
+        Employe employe1 = new Employe("A","B","C12345", LocalDate.now(),8000.0,4,1.0);
+        Employe employe2 = new Employe("C","D","C54321", LocalDate.now(),8000.0,6,1.0);
+        employeRepository.save(employe1);
+        employeRepository.save(employe2);
+
+        //when
+        employeService.calculPerformanceCommercial("C12345",110L,100L);
+
+
+        //then
+        Employe employeAfter = employeRepository.findByMatricule("C12345");
+        Assertions.assertThat(employeAfter.getPerformance()).isEqualTo(5);
+    }
+
+    @Test
+    public void testAvgPerformanceWhereMatriculeStartsWithC(){
+        //given
+        Employe employe1 = new Employe("A","B","C12345", LocalDate.now(),8000.0,4,1.0);
+        Employe employe2 = new Employe("C","D","C54321", LocalDate.now(),8000.0,6,1.0);
+        Employe employe3 = new Employe("E","F","T54321", LocalDate.now(),4000.0,1,1.0);
+        employeRepository.save(employe1);
+        employeRepository.save(employe2);
+        employeRepository.save(employe3);
+
+        //when
+        Double avgPerf = employeRepository.avgPerformanceWhereMatriculeStartsWith("C");
+
+        //then
+        Assertions.assertThat(avgPerf).isEqualTo(5.0);
+    }
 }

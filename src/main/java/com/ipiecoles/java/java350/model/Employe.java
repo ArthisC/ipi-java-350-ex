@@ -70,28 +70,24 @@ public class Employe {
      * nb congés - nb jours fériés qui ne tombe pas un week-end.
      * Le tout au pro-rata du taux d'activité du salarié (valeur du temps partiel)
      *
-     * @param d Date de l'année
+     * @param date Date de l'année
      * @return nombre de RTT
      */
-    public Integer getNbRtt(LocalDate d){
-        int i1 = d.isLeapYear() ? 366 : 365;
-        int var = 104;
-        switch (LocalDate.of(d.getYear(),1,1).getDayOfWeek()){
-        case THURSDAY:
-            //if(d.isLeapYear()) var =  var + 1;
-            break;
-        case FRIDAY:
-            if(d.isLeapYear()) var =  var + 2;
-            //else var =  var + 1;
-            break;
-        case SATURDAY:
-            var = var + 1;
-            break;
+    public Integer getNbRtt(LocalDate date){
+        int nbJoursAnnee = date.isLeapYear() ? 366 : 365;
+        int nbJoursWeekEnd = 104;
+        switch (LocalDate.of(date.getYear(),1,1).getDayOfWeek()){
+            case FRIDAY:
+                if(date.isLeapYear()) nbJoursWeekEnd =  nbJoursWeekEnd + 1;
+                break;
+            case SATURDAY:
+                if(date.isLeapYear()) nbJoursWeekEnd =  nbJoursWeekEnd + 2;
+                else nbJoursWeekEnd =  nbJoursWeekEnd + 1;
+                break;
         }
-        int monInt = (int) Entreprise.joursFeries(d).stream().filter(localDate ->
+        int nbJoursFeries = (int) Entreprise.joursFeries(date).stream().filter(localDate ->
                 localDate.getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()).count();
-        System.out.println(d.getYear() + " " + var);
-        return (int) Math.ceil((i1 - Entreprise.NB_JOURS_MAX_FORFAIT - var - Entreprise.NB_CONGES_BASE - monInt) * tempsPartiel);
+        return (int) Math.ceil((nbJoursAnnee - Entreprise.NB_JOURS_MAX_FORFAIT - nbJoursWeekEnd - Entreprise.NB_CONGES_BASE - nbJoursFeries) * tempsPartiel);
     }
 
     /**
