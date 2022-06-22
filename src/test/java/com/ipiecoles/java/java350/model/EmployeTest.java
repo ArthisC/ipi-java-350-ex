@@ -198,13 +198,13 @@ public class EmployeTest {
     })
     public void testGetNbRtt(
             Integer annee,
-            Double temps_partiel,
+            Double tempsPartiel,
             Integer nbRttAttendu
     ){
         //Given
         LocalDate date = LocalDate.of(annee,1,1);
         Employe employe = new Employe();
-        employe.setTempsPartiel(temps_partiel);
+        employe.setTempsPartiel(tempsPartiel);
 
         //When
         Integer nbRtt = employe.getNbRtt(date);
