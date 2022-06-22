@@ -9,6 +9,8 @@ import com.ipiecoles.java.java350.repository.EmployeRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -25,6 +27,8 @@ public class EmployeServiceTest {
     @InjectMocks
     EmployeService employeService = new EmployeService();
 
+
+    // Tests embaucheEmploye
     @Test
     public void testEmbaucheEmployeWithoutEmploye() throws EmployeException {
         //given
@@ -125,5 +129,91 @@ public class EmployeServiceTest {
 
         //then
         Assertions.assertThat(t).isInstanceOf(EmployeException.class).hasMessage("Limite des 100000 matricules atteinte !");
+    }
+
+
+    // Tests calculPerformanceCommercial
+    @Test
+    public void testCalculPerformanceCommercialWithCaTraiteNegatif(){
+        //given
+
+        //when
+        Throwable t = Assertions.catchThrowable(() -> {
+            employeService.calculPerformanceCommercial("C12345", -1L, 1L);
+        });
+
+        //then
+        Assertions.assertThat(t).isInstanceOf(EmployeException.class).hasMessage("Le chiffre d'affaire traité ne peut être négatif ou null !");
+    }
+
+    @Test
+    public void testCalculPerformanceCommercialWithObjectifCaNegatif(){
+        //given
+
+        //when
+        Throwable t = Assertions.catchThrowable(() -> {
+            employeService.calculPerformanceCommercial("C12345", 1L, -1L);
+        });
+
+        //then
+        Assertions.assertThat(t).isInstanceOf(EmployeException.class).hasMessage("L'objectif de chiffre d'affaire ne peut être négatif ou null !");
+    }
+
+    @Test
+    public void testCalculPerformanceCommercialWithMatriculeVautT(){
+        //given
+
+        //when
+        Throwable t = Assertions.catchThrowable(() -> {
+            employeService.calculPerformanceCommercial("T12345", 1L, 1L);
+        });
+
+        //then
+        Assertions.assertThat(t).isInstanceOf(EmployeException.class).hasMessage("Le matricule ne peut être null et doit commencer par un C !");
+    }
+
+    @Test
+    public void testCalculPerformanceCommercialWithMatriculeNotInBDD(){
+        //given
+        Mockito.when(employeRepository.findByMatricule("C12345")).thenReturn(null);
+
+        //when
+        Throwable t = Assertions.catchThrowable(() -> {
+            employeService.calculPerformanceCommercial("C12345", 1L, 1L);
+        });
+
+        //then
+        Assertions.assertThat(t).isInstanceOf(EmployeException.class).hasMessage("Le matricule C12345 n'existe pas !");
+    }
+    @ParameterizedTest
+    @CsvSource({
+            "50,1",  //cas 1
+            "90,8",  //cas 2
+            "100,10", //cas 3
+            "110,11", //cas 4
+            "150,15"  //cas 5 + perf > perfMoyenne
+    })
+    public void testCalculPerformanceCommercial(
+            Long caTraite,
+            Integer perforfanceFinale
+    ){
+        //given
+        Mockito.when(employeRepository.findByMatricule("C12345")).thenReturn(
+                new Employe("A","B","C12345",LocalDate.now(),2000.0, 10,1.0
+                        ));
+        Mockito.when(employeRepository.avgPerformanceWhereMatriculeStartsWith("C")).thenReturn(12.0);
+
+        //when
+        try {
+            employeService.calculPerformanceCommercial("C12345", caTraite, 100L);
+        } catch (EmployeException e) {
+            e.printStackTrace();
+        }
+
+        //then
+        ArgumentCaptor<Employe> employeCaptor = ArgumentCaptor.forClass(Employe.class);
+        Mockito.verify(employeRepository).save(employeCaptor.capture());
+        Employe employe = employeCaptor.getValue();
+        Assertions.assertThat(employe.getPerformance()).isEqualTo(perforfanceFinale);
     }
 }
