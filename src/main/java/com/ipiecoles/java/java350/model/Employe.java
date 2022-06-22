@@ -84,6 +84,8 @@ public class Employe {
                 if(date.isLeapYear()) nbJoursWeekEnd =  nbJoursWeekEnd + 2;
                 else nbJoursWeekEnd =  nbJoursWeekEnd + 1;
                 break;
+            default:
+                break;
         }
         int nbJoursFeries = (int) Entreprise.joursFeries(date).stream().filter(localDate ->
                 localDate.getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()).count();
